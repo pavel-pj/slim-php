@@ -1,0 +1,14 @@
+ <table>
+    <thead>
+    <tr><td>Заголовок</td><td>Оплата</td></tr>
+    </thead>
+    <?php foreach ($courses as $course): ?>
+    <tr>
+        <td><?= $course['title']?></td>
+        <td><?= $course['paid']?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+<br>
+ 
+<a href="/courses/new">Создать новую запись</a>

@@ -1,0 +1,48 @@
+<form action="/courses" method="post">
+
+
+  <div>
+        <label>
+            Курс
+            <input type="text" name="course[title]"
+                value="<?= htmlspecialchars($course['title']);?>"
+            >
+        </label>
+        <div class="error">
+            <?php
+                if (array_key_exists('title', $errors )): ?>
+                    <span><?=  $errors['title']   ?></span>
+            <?php endif;?>
+        </div>
+    </div>
+
+
+    <div>
+        <label>
+            Оплата
+
+            <select name="course[paid]">
+                <option value="null" > </option>
+                <option <?php $course['paid'] === true ? 'selected' : '' ?> value="true">Платный</option>
+                <option <?php $course['paid'] === false ? 'selected' : '' ?> value="false">Бесплатный</option>
+
+            </select>
+        </label>
+        <div class="error">
+          <?php if (array_key_exists('paid', $errors )): ?>
+                <span><?= $errors['paid'] ?? ''?></span>
+            <?php endif;?>
+        </div>
+    </div>
+
+    <input type="submit" value="Сохранить">
+
+
+</form>
+
+<style>
+    .error {
+        color:red;
+        padding:5px 5px 15px 5px;
+    }
+</style>
