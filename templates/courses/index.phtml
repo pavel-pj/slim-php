@@ -1,4 +1,8 @@
- <table>
+<?php  if ( count($messages) > 0) : ?>
+    <div class="<?= array_keys($messages)[0]?>" > <?=  $messages[array_keys($messages)[0]][0]?> </div>
+<?php endif;?>
+
+<table>
     <thead>
     <tr><td>Заголовок</td><td>Оплата</td></tr>
     </thead>
@@ -12,3 +16,14 @@
 <br>
  
 <a href="/courses/new">Создать новую запись</a>
+
+<style>
+    .success {
+        color:green;
+        font-size:1.5em;
+    }
+    .error {
+        color:red;
+        font-size:1.5em;
+    }
+</style>
