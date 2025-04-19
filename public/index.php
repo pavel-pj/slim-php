@@ -10,6 +10,7 @@ use DI\Container;
 use App\Validator;
 use App\CourseRepository;
 use App\PostRepository;
+ use App\PostSessionRepository;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +23,7 @@ session_start();
 
 $repo = new CourseRepository();
 $repoPosts = new PostRepository();
+ $repoPostsSession = new PostSessionRepository();
 $validator = new Validator();
 
 
@@ -44,22 +46,61 @@ $app = AppFactory::createFromContainer($container);
 
 $app->addErrorMiddleware(true, true, true);
 
+$router = $app->getRouteCollector()->getRouteParser();
 
-$app->get('/all',function ($request, $response ) use ($repoPosts) {
+$app->get('/posts/new',function ($request, $response ) {
 
-    var_dump($repoPosts->all());
+   // $messages = $this->get('flash')->getMessages();
+    $params = [
+        'post' => [],
+        'errors' => [],
+       // 'message' =>$messages,
+    ];
+    return $this->get('renderer')->render($response, 'posts/new.phtml' ,$params);
 
-    $params =[
-        'posts'=> $repoPosts->all(),
-        'nextPage' => ['page' => 1],
-        'previousPage' => ['page' => 1]
+}) ;
+
+
+
+$app->post('/posts',function ($request, $response ) use ($repoPostsSession, $validator, $router) {
+
+    $post= $request->getParsedBodyParam('post');
+    $errors = $validator->validate($post);
+    $flash = $this->get('flash');
+    if (count($errors) === 0) {
+
+        $repoPostsSession->save($post);
+        $flash->addMessage('success', 'Успешная запись!');
+
+       // return $response->withRedirect('/posts', 302);
+        $url = $router->urlFor('posts');
+        return $response->withRedirect($url);
+    }
+
+    $params = [
+        'post' => $post,
+        'errors' => $errors
     ];
 
-    return $this->get('renderer')->render($response, 'posts/index.phtml' ,$params);
-});
+    return $this->get('renderer')->render(
+        $response->withStatus(422),
+        'posts/new.phtml', $params);
+
+})->setName('postSave');
+
+$app->get('/posts', function ($request, $response) use ($repoPostsSession) {
+    $flash = $this->get('flash')->getMessages();
+
+    $params = [
+        'flash' => $flash,
+        'posts' => $repoPostsSession->all()
+    ];
+    return $this->get('renderer')->render($response, 'posts/index.phtml', $params);
+})->setName('posts');
+
+
 
 /*
-
 $app->get('/posts',function ($request, $response) use ($repoPosts)   {
     $page = 0;
     $per = 5;
@@ -121,6 +162,7 @@ $app->get('/posts/{id}',function ($request, $response, $args) use ($repoPosts) {
 
     return $this->get('renderer')->render($response, 'posts/show.phtml' ,$params);
 });
+
 
 
 
