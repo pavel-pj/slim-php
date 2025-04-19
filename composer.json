@@ -9,7 +9,8 @@
         "slim/php-view": "^3.4",
         "php-di/php-di": "^7.0",
         "fakerphp/faker": "^1.24",
-        "slim/flash": "^0.4.0"
+        "slim/flash": "^0.4.0",
+        "illuminate/collections": "^10.48"
     }
 
 }

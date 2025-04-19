@@ -9,12 +9,19 @@ use Illuminate\Support\Collection;
 use DI\Container;
 use App\Validator;
 use App\CourseRepository;
+use App\PostRepository;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+ use Slim\Exception\HttpExceptionInterface;
 
 
 // Старт PHP сессии
 session_start();
 
 $repo = new CourseRepository();
+$repoPosts = new PostRepository();
 $validator = new Validator();
 
 
@@ -38,30 +45,83 @@ $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 
 
+$app->get('/all',function ($request, $response ) use ($repoPosts) {
+
+    var_dump($repoPosts->all());
+
+    $params =[
+        'posts'=> $repoPosts->all(),
+        'nextPage' => ['page' => 1],
+        'previousPage' => ['page' => 1]
+    ];
+
+    return $this->get('renderer')->render($response, 'posts/index.phtml' ,$params);
+});
+
 /*
-$app->get('/foo', function ($req, $res) {
-    // Добавление флеш-сообщения. Оно станет доступным на следующий HTTP-запрос.
-    // 'success' — тип флеш-сообщения. Используется при выводе для форматирования.
-    // Например, можно ввести тип success и отражать его зеленым цветом (на Хекслете такого много)
+
+$app->get('/posts',function ($request, $response) use ($repoPosts)   {
+    $page = 0;
+    $per = 5;
+    $params = $request->getQueryParams();
+    if  (isset($params['page'])) {
+        $page = (int)$params['page'];
+    }
+    if  (isset($params['per'])) {
+        $per = (int)$params['per'];
+
+    }
 
 
-// Получаем flash-сообщения из контейнера
-    $flash = $this->get('flash');
-    $flash->addMessage('Test', 'This is a message');
 
-    return $res->withRedirect('/bar');
+    $posts = $repoPosts->all();
+    $newPosts = [
+        'carry-post' =>[],
+        'iter' => 1
+    ];
+    $result = array_reduce($posts, function ($carry, $post) use ($page,$per) {
+
+
+        $currentIter = $carry['iter'];
+
+        if ($currentIter > ($page * $per) && $currentIter <= (($page + 1) * $per)){
+            $carry['carry-post'][] = $post;
+        }
+        $carry['iter'] += 1;
+        return $carry;
+
+    },$newPosts);
+
+    $postsPerPage = $result['carry-post'];
+    $nextPage = 0;
+    $previousPage = 0;
+
+    if ( ($page+1) * $per < count($posts) ) {
+        ($page > 0) ? $nextPage += $page+1 : $nextPage = 2;
+    }
+    if ($page - 1 > 0 ) {
+        $previousPage = $page - 1;
+    }
+
+    $params =[
+      'posts'=> $postsPerPage,
+      'nextPage' => ['page' => $nextPage],
+      'previousPage' => ['page' => $previousPage]
+    ];
+
+    return $this->get('renderer')->render($response, 'posts/index.phtml' ,$params);
 });
 
-$app->get('/bar', function ($req, $res) {
-    // Извлечение flash-сообщений, установленных на предыдущем запросе
-    $messages = $this->get('flash')->getMessages();
-    print_r($messages); // => ['success' => ['This is a message']]
 
-    $params = ['flash' => $messages];
-    return $this->get('renderer')->render($res, 'bar.phtml', $params);
+$app->get('/posts/{id}',function ($request, $response, $args) use ($repoPosts) {
+
+    $params = [
+        'post' => $repoPosts->find($args['id'])
+    ];
+
+    return $this->get('renderer')->render($response, 'posts/show.phtml' ,$params);
 });
 
-*/
 
 
 
@@ -78,9 +138,8 @@ $app->get('/courses', function ($request, $response) use ($repo) {
 });
 
 
+
 $app->get('/courses/new', function ($request, $response) {
-
-
     $messages = $this->get('flash')->getMessages();
     $params = [
         'course' => [],
@@ -90,6 +149,19 @@ $app->get('/courses/new', function ($request, $response) {
 
     return $this->get('renderer')->render($response, 'courses/new.phtml' ,$params   );
 });
+
+$app->get('/courses/{id}', function ($request, $response, $args) use ($repo) {
+
+    $course = $repo->find($args['id']);
+
+    $params = [
+        'course' => $course,
+
+    ];
+
+    return $this->get('renderer')->render($response, 'courses/show.phtml' ,$params);
+});
+
 
 $app->post('/courses', function ($request, $response) use ($repo,$validator) {
 
@@ -107,7 +179,7 @@ $app->post('/courses', function ($request, $response) use ($repo,$validator) {
         'course' => $course,
         'errors' => $errors
     ];
- 
+
    return $this->get('renderer')->render(
        $response->withStatus(422),
        'courses/new.phtml', $params);
@@ -149,6 +221,9 @@ $app->get('/users', function ($request, $response) use ($users) {
 
 
 */
+
+
+
 
 
 $app->run();

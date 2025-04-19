@@ -1,0 +1,16 @@
+<h3>Курс <?= $course['title'];?></h3>
+<table>
+    <thead>
+    <tr>
+        <td><strong>Title</strong></td><td><strong>Оплата</strong></td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><?= htmlspecialchars($course['title']);?></td>
+        <td><?= ($course['paid']) ? "Платный" : "Бсплатный";?></td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/courses">Курсы </a>

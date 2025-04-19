@@ -1,0 +1,58 @@
+<div class="display: flex;flex-direction: row">
+    <?php if ($previousPage['page']):?>
+    <div><a href="posts?page=<?= $previousPage['page']  ?>&per=5">Назад</a></div>
+    <?php endif;?>
+    <?php if ($nextPage['page']):?>
+        <div><a href="posts?page=<?= $nextPage['page']  ?>&per=5">Вперёд</a></div>
+    <?php endif;?>
+
+</div>
+<table >
+    <thead>
+    <tr>
+        
+        <td>Post</td>
+        
+    </tr>
+    </thead>
+    <tbody>
+    <?php
+    $row = 0;
+    foreach ($posts as $post):
+    $row += 1;
+    $colClass = ($row % 2 == 0) ?   'grey' :  'white'; ?>
+    <tr class="<?= $colClass ?> ">
+
+        <td>
+            <a href="posts/<?= $post['id'];?>">
+                <?= htmlspecialchars($post['name']);?>
+            </a>
+        </td>
+
+    </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+
+<style>
+
+    table {
+        margin:25px;
+    }
+    .grey {
+        background-color:lightgrey;
+
+    }
+    .white{
+        background-color: white;
+    }
+
+    td {
+      padding:5px 15px ;
+    }
+    thead td {
+        font-size:20px;
+        color:blue;
+        font-weight: bold;
+    }
+</style>

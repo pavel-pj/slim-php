@@ -1,0 +1,14 @@
+<div class="card">
+    <h4>Name</h4>
+    <div> <?= htmlspecialchars($post['name']);?> </div>
+    <h4>Body</h4>
+    <div> <?= htmlspecialchars($post['body']);?></div>
+    <a href="/posts">Посты</a>
+</div>
+
+<style>
+    .card {
+        margin:auto;
+        width:300px;
+    }
+</style>
