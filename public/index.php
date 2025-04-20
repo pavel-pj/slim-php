@@ -10,12 +10,12 @@ use DI\Container;
 use App\Validator;
 use App\CourseRepository;
 use App\PostRepository;
- use App\PostSessionRepository;
+use App\PostSessionRepository;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
- use Slim\Exception\HttpExceptionInterface;
+use Slim\Exception\HttpExceptionInterface;
 
 
 // Старт PHP сессии
@@ -42,8 +42,36 @@ $container->set('flash', function () {
 });
 
 $app = AppFactory::createFromContainer($container);
+/*
+$logMiddleware = function (Request $request, RequestHandler $handler): ResponseInterface {
+    // Логируем информацию о запросе
+    // Тут мы для простоты используем обычную функцию
+    // В реальности мы бы использовали специальную библиотеку, например Monolog
+    error_log("Request: {$request->getMethod()} {$request->getUri()}");
 
+    // Передаем управление следующей мидлваре или обработчику
+    return $handler->handle($request);
+};
 
+$app->add($logMiddleware);
+*/
+
+$hashMiddleware = function (ServerRequestInterface $request,RequestHandlerInterface $handler): ResponseInterface {
+    $response = $handler->handle($request);
+
+    // Получаем содержимое тела ответа
+    $body = (string) $response->getBody();
+
+    // Здесь вы можете обработать тело ответа (например, вычислить хеш)
+    $hash = hash('sha256', $body);
+
+    // Для примера, добавим хеш в заголовки ответа
+    $response = $response->withHeader('X-Content-Hash', $hash);
+    
+    return $response;
+};
+
+$app->add($hashMiddleware);
 $app->addErrorMiddleware(true, true, true);
 
 $router = $app->getRouteCollector()->getRouteParser();
@@ -262,11 +290,14 @@ $app->get('/users', function ($request, $response) use ($users) {
 });
 
 
+
+
+
+
+
+
+$app->run();
 */
-
-
-
-
 
 $app->run();
 
