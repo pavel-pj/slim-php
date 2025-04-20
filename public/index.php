@@ -11,7 +11,7 @@ use App\Validator;
 use App\CourseRepository;
 use App\PostRepository;
 use App\PostSessionRepository;
-
+use App\PostCookieRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -23,7 +23,8 @@ session_start();
 
 $repo = new CourseRepository();
 $repoPosts = new PostRepository();
- $repoPostsSession = new PostSessionRepository();
+$repoPostsSession = new PostSessionRepository();
+$repoPostsCookie = new PostCookieRepository();
 $validator = new Validator();
 
 
@@ -42,19 +43,6 @@ $container->set('flash', function () {
 });
 
 $app = AppFactory::createFromContainer($container);
-/*
-$logMiddleware = function (Request $request, RequestHandler $handler): ResponseInterface {
-    // Логируем информацию о запросе
-    // Тут мы для простоты используем обычную функцию
-    // В реальности мы бы использовали специальную библиотеку, например Monolog
-    error_log("Request: {$request->getMethod()} {$request->getUri()}");
-
-    // Передаем управление следующей мидлваре или обработчику
-    return $handler->handle($request);
-};
-
-$app->add($logMiddleware);
-*/
 
 $hashMiddleware = function (ServerRequestInterface $request,RequestHandlerInterface $handler): ResponseInterface {
     $response = $handler->handle($request);
@@ -67,7 +55,7 @@ $hashMiddleware = function (ServerRequestInterface $request,RequestHandlerInterf
 
     // Для примера, добавим хеш в заголовки ответа
     $response = $response->withHeader('X-Content-Hash', $hash);
-    
+
     return $response;
 };
 
@@ -75,14 +63,54 @@ $app->add($hashMiddleware);
 $app->addErrorMiddleware(true, true, true);
 
 $router = $app->getRouteCollector()->getRouteParser();
+/*
+$app->get('/coo', function ($request, $response) {
+
+    $posts = json_decode($request->getCookieParam('posts', json_encode([])), true);
+
+    $params = [
+      'posts' => $posts,
+
+    ];
+
+    return $this->get('renderer')->render(
+        $response
+        , 'cookie/index.phtml' ,$params);
+
+
+})->setName('coo');
+
+$app->post('/coo', function ($request, $response) use ($repoPostsCookie, $router){
+// Информация о добавляемом товаре
+    $item = $request->getParsedBodyParam('post');
+    var_dump($item);
+    $posts = $repoPostsCookie->save($item, $request);
+    // Данные корзины
+    //$cart = json_decode($request->getCookieParam('cart', json_encode([])), true);
+
+    // Добавление нового товара
+    //$cart[] = $item;
+
+    // Кодирование корзины
+   // $encodedCart = json_encode($cart);
+
+    // Установка новой корзины в куку
+   // return $response->withHeader('Set-Cookie', "cart=1234")
+   //     ->withRedirect('/coo');
+
+
+    $url = $router->urlFor('coo');
+    return $response->withRedirect($url)->withHeader('Set-Cookie', "posts={$posts}");
+
+});
+*/
 
 $app->get('/posts/new',function ($request, $response ) {
 
-   // $messages = $this->get('flash')->getMessages();
     $params = [
         'post' => [],
         'errors' => [],
-       // 'message' =>$messages,
+
     ];
     return $this->get('renderer')->render($response, 'posts/new.phtml' ,$params);
 
@@ -90,17 +118,16 @@ $app->get('/posts/new',function ($request, $response ) {
 
 
 
-$app->post('/posts',function ($request, $response ) use ($repoPostsSession, $validator, $router) {
+$app->post('/posts',function ($request, $response ) use ($repoPostsCookie, $validator, $router) {
 
     $post= $request->getParsedBodyParam('post');
     $errors = $validator->validate($post);
     $flash = $this->get('flash');
     if (count($errors) === 0) {
 
-        $repoPostsSession->save($post);
+        $repoPostsCookie->save($post,$request);
         $flash->addMessage('success', 'Успешная запись!');
 
-       // return $response->withRedirect('/posts', 302);
         $url = $router->urlFor('posts');
         return $response->withRedirect($url);
     }
@@ -116,12 +143,12 @@ $app->post('/posts',function ($request, $response ) use ($repoPostsSession, $val
 
 })->setName('postSave');
 
-$app->get('/posts', function ($request, $response) use ($repoPostsSession) {
+$app->get('/posts', function ($request, $response) use ($repoPostsCookie) {
     $flash = $this->get('flash')->getMessages();
 
     $params = [
         'flash' => $flash,
-        'posts' => $repoPostsSession->all()
+        'posts' => $repoPostsCookie->all($request)
     ];
     return $this->get('renderer')->render($response, 'posts/index.phtml', $params);
 })->setName('posts');
