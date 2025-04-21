@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 use App\PostGenerator;
 use Illuminate\Support\Collection;
 
@@ -23,4 +24,3 @@ class PostRepository
         return collect($this->posts)->firstWhere('id', $id);
     }
 }
-

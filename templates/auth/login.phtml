@@ -1,0 +1,38 @@
+<?=  $credentials['message'];?>
+
+<?php if (!isset($_SESSION['user'])): ?>
+<h3>Вход в систему</h3> <br>
+<form action="/login" method="post">
+   <div>
+        <label>
+            email
+            <input type="text" name="auth[email]"
+                   value="<?= $auth['email'] ?>"
+            >
+        </label>
+        <div class="error">
+            <?php
+            if (array_key_exists('email', $errors )): ?>
+                <span><?=  $errors['email']   ?></span>
+            <?php endif;?>
+        </div>
+    </div>
+
+    <input type="submit" value="Войти">
+
+
+</form>
+<?php endif;?>
+
+<?php if (isset($_SESSION['user'])): ?>
+    <form action="/logout" method="post">
+         <input type="submit" value="Выйти">
+    </form>
+<?php endif;?>
+<style>
+    .error {
+        color:red;
+        padding:5px 5px 15px 5px;
+    }
+</style>
+

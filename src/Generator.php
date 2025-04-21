@@ -3,6 +3,7 @@
 namespace App;
 
 use Faker\Factory as FakerFactory;
+
 class Generator
 {
     public static function generate($count)

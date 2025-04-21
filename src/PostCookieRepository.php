@@ -13,8 +13,7 @@ class PostCookieRepository
         return  json_decode($request->getCookieParam('posts', json_encode([])), true);
     }
 
-
-    public function save(array $item , $request )
+    public function save(array $item, $request)
     {
         if (empty($item['name']) || empty($item['body'])) {
             $json = json_encode($item);
@@ -24,10 +23,9 @@ class PostCookieRepository
             $item['id'] = uniqid();
         }
 
-         $posts = json_decode($request->getCookieParam('posts', json_encode([])), true);
-         $posts[] = $item;
-         $encodedPost = json_encode($posts);
-        
+        $posts = json_decode($request->getCookieParam('posts', json_encode([])), true);
+        $posts[] = $item;
+        $encodedPost = json_encode($posts);
         return $encodedPost;
     }
 }

@@ -44,7 +44,9 @@ $container->set('flash', function () {
 
 $app = AppFactory::createFromContainer($container);
 
-$hashMiddleware = function (ServerRequestInterface $request,RequestHandlerInterface $handler): ResponseInterface {
+$hashMiddleware = function (
+    ServerRequestInterface $request,
+    RequestHandlerInterface $handler): ResponseInterface {
     $response = $handler->handle($request);
 
     // Получаем содержимое тела ответа
@@ -63,69 +65,22 @@ $app->add($hashMiddleware);
 $app->addErrorMiddleware(true, true, true);
 
 $router = $app->getRouteCollector()->getRouteParser();
-/*
-$app->get('/coo', function ($request, $response) {
 
-    $posts = json_decode($request->getCookieParam('posts', json_encode([])), true);
-
-    $params = [
-      'posts' => $posts,
-
-    ];
-
-    return $this->get('renderer')->render(
-        $response
-        , 'cookie/index.phtml' ,$params);
-
-
-})->setName('coo');
-
-$app->post('/coo', function ($request, $response) use ($repoPostsCookie, $router){
-// Информация о добавляемом товаре
-    $item = $request->getParsedBodyParam('post');
-    var_dump($item);
-    $posts = $repoPostsCookie->save($item, $request);
-    // Данные корзины
-    //$cart = json_decode($request->getCookieParam('cart', json_encode([])), true);
-
-    // Добавление нового товара
-    //$cart[] = $item;
-
-    // Кодирование корзины
-   // $encodedCart = json_encode($cart);
-
-    // Установка новой корзины в куку
-   // return $response->withHeader('Set-Cookie', "cart=1234")
-   //     ->withRedirect('/coo');
-
-
-    $url = $router->urlFor('coo');
-    return $response->withRedirect($url)->withHeader('Set-Cookie', "posts={$posts}");
-
-});
-*/
-
-$app->get('/posts/new',function ($request, $response ) {
-
+$app->get('/posts/new', function ($request, $response) {
     $params = [
         'post' => [],
         'errors' => [],
-
     ];
-    return $this->get('renderer')->render($response, 'posts/new.phtml' ,$params);
-
+    return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
 }) ;
 
+$app->post('/posts', function ($request, $response) use ($repoPostsCookie, $validator, $router) {
 
-
-$app->post('/posts',function ($request, $response ) use ($repoPostsCookie, $validator, $router) {
-
-    $post= $request->getParsedBodyParam('post');
+    $post = $request->getParsedBodyParam('post');
     $errors = $validator->validate($post);
     $flash = $this->get('flash');
     if (count($errors) === 0) {
-
-        $repoPostsCookie->save($post,$request);
+        $repoPostsCookie->save($post, $request);
         $flash->addMessage('success', 'Успешная запись!');
 
         $url = $router->urlFor('posts');
@@ -139,8 +94,9 @@ $app->post('/posts',function ($request, $response ) use ($repoPostsCookie, $vali
 
     return $this->get('renderer')->render(
         $response->withStatus(422),
-        'posts/new.phtml', $params);
-
+        'posts/new.phtml',
+        $params
+    );
 })->setName('postSave');
 
 $app->get('/posts', function ($request, $response) use ($repoPostsCookie) {
@@ -326,6 +282,58 @@ $app->get('/users', function ($request, $response) use ($users) {
 $app->run();
 */
 
+
+$app->get('/login', function ($request, $response) {
+
+    $credentials = ['message' => 'Вы не авторизованы в системе'];
+    if (isset($_SESSION['user']) && $_SESSION['user'] === 'authenticated') {
+        $credentials = ['message' => 'Вы вошли как User'];
+    }
+
+    $params = [
+        'credentials' => $credentials,
+        'errors' => [],
+    ];
+    return $this->get('renderer')->render($response, 'auth/login.phtml', $params);
+});
+
+$app->post('/login', function ($request, $response) {
+    $errors = [];
+    $email = $request->getParsedBodyParam('email');
+    $credentials = ['message' => 'Вы не авторизованы в системе'];
+
+    if ($email !== 'admin@mail.ru' && !isset($_SESSION['user'])) {
+        $errors = ['email' => 'не существует такого пользователя в системе'];
+    }
+
+    if (!isset($_SESSION['user'])) {
+        $_SESSION['user'] = 'authenticated';
+        $credentials = ['message' => 'Вы вошли как User'];
+    }
+
+    $params = [
+        'credentials' => $credentials,
+        'errors' => $errors,
+    ];
+    return $this->get('renderer')->render($response, 'auth/login.phtml', $params);
+});
+
+
+$app->post('/logout', function ($request, $response) {
+
+    $credentials = ['message' => 'Вы вошли как User'];
+    $errors = [];
+
+    if (isset($_SESSION['user']) && $_SESSION['user'] === 'authenticated') {
+        $credentials = ['message' => 'Вы не авторизованы в системе'];
+        unset($_SESSION['user']);
+    }
+
+    $params = [
+        'credentials' => $credentials,
+        'errors' => $errors,
+    ];
+    return $this->get('renderer')->render($response, 'auth/login.phtml', $params);
+}) ;
+
 $app->run();
-
-
