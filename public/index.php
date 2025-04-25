@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Exception\HttpExceptionInterface;
+use Slim\Middleware\MethodOverrideMiddleware;
 
 
 // Старт PHP сессии
@@ -63,8 +64,66 @@ $hashMiddleware = function (
 
 $app->add($hashMiddleware);
 $app->addErrorMiddleware(true, true, true);
+$app->add(MethodOverrideMiddleware::class);
+
+$users = [
+    ['name' => 'admin', 'passwordDigest' => password_hash('secret', PASSWORD_DEFAULT)],
+    ['name' => 'mike', 'passwordDigest' => password_hash('superpass', PASSWORD_DEFAULT)],
+    ['name' => 'kate', 'passwordDigest' => password_hash('strongpass', PASSWORD_DEFAULT)]
+];
 
 $router = $app->getRouteCollector()->getRouteParser();
+
+$app->get('/', function ($request, $response) use ($users) {
+
+    $params = [];
+    if(isset($_SESSION['user'])) {
+        $params['user'] = $_SESSION['user'];
+    }
+
+    var_dump($_SESSION['user']);
+
+    return $this->get('renderer')->render($response, 'index.phtml', $params);
+});
+
+$app->post('/session', function ($request, $response) use ($users) {
+
+    $auth = $request->getParsedBodyParam('auth');
+
+    $params =[];
+    if (isset( $auth['name'])) {
+        $user = array_filter($users, function($item) use ($auth) {
+            return $item['name'] === $auth['name'];
+        })[0];
+
+        if ($user) {
+            $validated = password_verify(
+                    $auth['password'],
+                    $user['passwordDigest']);
+
+
+            $_SESSION['user'] = ['name'=>$user['name']];
+
+            $params =[
+                'user' => $_SESSION['user']
+            ];
+        }
+
+    }
+
+    return $this->get('renderer')->render($response, 'index.phtml', $params);
+
+
+});
+
+$app->delete('/session', function ($request, $response) {
+
+    $auth = $request->getParsedBodyParam('auth');
+
+    $params = [];
+
+    return $this->get('renderer')->render($response, 'index.phtml', $params);
+});
 
 $app->get('/posts/new', function ($request, $response) {
     $params = [

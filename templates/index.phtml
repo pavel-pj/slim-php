@@ -1,2 +1,33 @@
 <a href="/courses">Курсы</a>
+
+<?php if (isset($user['name'])) {?>
+ <div><strong>Имя </strong>: <?= $user['name'];?></div>
+<form action="session" method="POST">
+    <input type="hidden" name="_METHOD" value="DELETE">
+    <input type="submit" value="Sign Out">
+</form>
+
+<?php } else { ?>
+    <form action="session" method="POST">
+        <div>
+            <div>
+            <label>
+                Name
+                <input type="text" name="auth[name]"
+                       value="<?= $auth['name'] ?>"
+                >
+            </label>
+            </div>
+            <div>
+            <label>
+                Password
+                <input type="text" name=auth[password]"
+                       value="<?= $auth['password'] ?>"
+                >
+            </label>
+            </div>
+        </div>
+        <input type="submit" value="Sign In">
+    </form>
+<?php }?>
  
