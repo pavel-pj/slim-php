@@ -75,54 +75,61 @@ $users = [
 $router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) use ($users) {
-
-    $params = [];
+    $flash = $this->get('flash')->getMessages();
+    $params = [
+        'flash' => $flash,
+    ];
     if(isset($_SESSION['user'])) {
-        $params['user'] = $_SESSION['user'];
+        $params['validated'] = $_SESSION['user'];
     }
 
-    var_dump($_SESSION['user']);
 
     return $this->get('renderer')->render($response, 'index.phtml', $params);
-});
+})->setName('index');
 
-$app->post('/session', function ($request, $response) use ($users) {
+$app->post('/session', function ($request, $response) use ($users, $router) {
 
-    $auth = $request->getParsedBodyParam('auth');
+    $auth = $request->getParsedBodyParam('user');
 
-    $params =[];
-    if (isset( $auth['name'])) {
-        $user = array_filter($users, function($item) use ($auth) {
-            return $item['name'] === $auth['name'];
-        })[0];
+    //$params =[];
+    if (!isset( $auth['name'])) {
+        $url = $router->urlFor('index');
+        return $response->withRedirect($url);
+    }
+    $user = array_values(array_filter($users, function($item) use ($auth) {
+        return $item['name'] === $auth['name'];
+    }))[0];
 
-        if ($user) {
-            $validated = password_verify(
-                    $auth['password'],
-                    $user['passwordDigest']);
-
-
-            $_SESSION['user'] = ['name'=>$user['name']];
-
-            $params =[
-                'user' => $_SESSION['user']
-            ];
-        }
-
+    if (!$user){
+        $flash = $this->get('flash');
+        $flash->addMessage('error', 'Wrong password or name');
+        $url = $router->urlFor('index');
+        return $response->withRedirect($url);
     }
 
-    return $this->get('renderer')->render($response, 'index.phtml', $params);
+    $validated = password_verify(
+            $auth['password'],
+            $user['passwordDigest']);
+    if (!$validated) {
+        $flash = $this->get('flash');
+        $flash->addMessage('error', 'Wrong password or name');
+        $url = $router->urlFor('index');
+        return $response->withRedirect($url);
+    }
+    $flash = $this->get('flash');
+    $flash->addMessage('success', 'Успешная аутентификация!');
+    $_SESSION['user'] = ['name' => $user['name']];
 
-
+    $url = $router->urlFor('index');
+    return $response->withRedirect($url);
 });
 
-$app->delete('/session', function ($request, $response) {
-
-    $auth = $request->getParsedBodyParam('auth');
-
-    $params = [];
-
-    return $this->get('renderer')->render($response, 'index.phtml', $params);
+$app->delete('/session', function ($request, $response) use ($router) {
+    if (isset($_SESSION['user'])) {
+        $_SESSION = [];
+        $url = $router->urlFor('index');
+        return $response->withRedirect($url);
+    }
 });
 
 $app->get('/posts/new', function ($request, $response) {

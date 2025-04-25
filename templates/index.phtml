@@ -1,7 +1,17 @@
 <a href="/courses">Курсы</a>
 
-<?php if (isset($user['name'])) {?>
- <div><strong>Имя </strong>: <?= $user['name'];?></div>
+<?php if (count($flash) > 0): ?>
+    <ul>
+        <?php foreach ($flash as $messages): ?>
+            <?php foreach ($messages as $message): ?>
+                <li><?= $message ?></li>
+            <?php endforeach ?>
+        <?php endforeach ?>
+    </ul>
+<?php endif ?>
+
+<?php if (isset($validated['name'])) {?>
+ <div><strong>Имя </strong>: <?= $validated['name'];?></div>
 <form action="session" method="POST">
     <input type="hidden" name="_METHOD" value="DELETE">
     <input type="submit" value="Sign Out">
@@ -13,16 +23,16 @@
             <div>
             <label>
                 Name
-                <input type="text" name="auth[name]"
-                       value="<?= $auth['name'] ?>"
+                <input type="text" name="user[name]"
+                       value="<?= $user['name'] ?>"
                 >
             </label>
             </div>
             <div>
             <label>
                 Password
-                <input type="text" name=auth[password]"
-                       value="<?= $auth['password'] ?>"
+                <input type="text" name=user[password]"
+                       value="<?= $user['password'] ?>"
                 >
             </label>
             </div>
