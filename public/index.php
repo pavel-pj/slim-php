@@ -194,6 +194,8 @@ $app->post('/posts', function ($request, $response) use ($repoPostsCookie, $vali
     );
 })->setName('postSave');
 
+
+
 $app->get('/posts', function ($request, $response) use ($repoPostsCookie) {
     $flash = $this->get('flash')->getMessages();
 
@@ -204,7 +206,20 @@ $app->get('/posts', function ($request, $response) use ($repoPostsCookie) {
     return $this->get('renderer')->render($response, 'posts/index.phtml', $params);
 })->setName('posts');
 
+$app->get('/html-pseudo', function ($request, $response)  {
 
+    $rows = [
+         "выбирает первый элемент внутри родителя, учиты",
+         "Обсуждаем возможности SASS, позволяющие немного расширить язык CSS",
+         "РФ Сын заместителя директора ЦРУ Джулиан Глосс",
+          "Он был направлен в 106-ю гвардейскую воздушно-десантную дивизию",
+    ];
+
+    $params = [
+        'rows' => $rows
+    ];
+    return $this->get('renderer')->render($response, 'html/pseudo.phtml', $params);
+});
 
 /*
 $app->get('/posts',function ($request, $response) use ($repoPosts)   {
