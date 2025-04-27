@@ -10,6 +10,7 @@ use DI\Container;
 use App\Validator;
 use App\CourseRepository;
 use App\PostRepository;
+use App\CarRepository;
 use App\PostSessionRepository;
 use App\PostCookieRepository;
 use Psr\Http\Message\ResponseInterface;
@@ -43,7 +44,7 @@ $container->set('flash', function () {
     return new \Slim\Flash\Messages();
 });
 
-$app = AppFactory::createFromContainer($container);
+
 
 $hashMiddleware = function (
     ServerRequestInterface $request,
@@ -62,10 +63,38 @@ $hashMiddleware = function (
     return $response;
 };
 
+
+$container->set(\PDO::class, function () {
+    $conn = new \PDO('sqlite:database.sqlite');
+    $conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+    return $conn;
+});
+
+$initFilePath = implode('/', [dirname(__DIR__), 'init.sql']);
+$initSql = file_get_contents($initFilePath);
+$container->get(\PDO::class)->exec($initSql);
+
+$app = AppFactory::createFromContainer($container);
 $app->add($hashMiddleware);
 $app->addErrorMiddleware(true, true, true);
 $app->add(MethodOverrideMiddleware::class);
 
+
+ 
+$app->get('/cars', function ($request, $response) {
+    $carRepository = $this->get(CarRepository::class);
+    $cars = $carRepository->getEntities();
+
+    $messages = $this->get('flash')->getMessages();
+
+    $params = [
+        'cars' => $cars,
+        'flash' => $messages
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/index.phtml', $params);
+})->setName('cars.index');
+/*
 $users = [
     ['name' => 'admin', 'passwordDigest' => password_hash('secret', PASSWORD_DEFAULT)],
     ['name' => 'mike', 'passwordDigest' => password_hash('superpass', PASSWORD_DEFAULT)],
