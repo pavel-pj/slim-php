@@ -94,7 +94,7 @@ $app->get('/cars', function ($request, $response) {
 
     return $this->get('renderer')->render($response, 'cars/index.phtml', $params);
 })->setName('cars.index');
-/*
+
 $users = [
     ['name' => 'admin', 'passwordDigest' => password_hash('secret', PASSWORD_DEFAULT)],
     ['name' => 'mike', 'passwordDigest' => password_hash('superpass', PASSWORD_DEFAULT)],
@@ -332,7 +332,7 @@ $app->post('/courses', function ($request, $response) use ($repo,$validator) {
        $response->withStatus(422),
        'courses/new.phtml', $params);
 });
-/*
+
 
 
 $app->get('/cities/{id}', function ($request, $response,$arguments) {
@@ -367,15 +367,6 @@ $app->get('/users', function ($request, $response) use ($users) {
     return $this->get('renderer')->render($response, 'users/index.phtml', $usersPack);
 });
 
-
-
-
-
-
-
-
-$app->run();
-*/
 
 
 $app->get('/login', function ($request, $response) {
@@ -430,5 +421,5 @@ $app->post('/logout', function ($request, $response) {
     ];
     return $this->get('renderer')->render($response, 'auth/login.phtml', $params);
 }) ;
-
+*/
 $app->run();
