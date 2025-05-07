@@ -18,6 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Exception\HttpExceptionInterface;
 use Slim\Middleware\MethodOverrideMiddleware;
+use App\Cls\Error;
 
 
 // Старт PHP сессии
@@ -43,8 +44,6 @@ $container->set('renderer', function () {
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
 });
-
-
 
 $hashMiddleware = function (
     ServerRequestInterface $request,
@@ -80,7 +79,28 @@ $app->addErrorMiddleware(true, true, true);
 $app->add(MethodOverrideMiddleware::class);
 
 
- 
+
+
+
+$app->get('/err', function ($request, $response) {
+
+    $error = new Error(50);
+    $value = $error->getNum();
+
+
+    $params = [
+        'value' => [
+            'number'=>$value,
+            'tmp' =>sys_get_temp_dir()
+
+        ]
+    ];
+
+    return $this->get('renderer')->render($response, 'err/index.phtml', $params);
+}) ;
+
+
+ /*
 $app->get('/cars', function ($request, $response) {
     $carRepository = $this->get(CarRepository::class);
     $cars = $carRepository->getEntities();

@@ -1,4 +1,4 @@
-
+<?php /*
 <table  >
 <?php foreach($rows as $row):?>
     <tr>
@@ -11,9 +11,77 @@
 </table>
 
 <style>
-   table tr:nth-of-type(2n)  {
+   table tr:nth-of-type(3n )  {
         background: #f44336;
     }
 
 
+</style>
+ */?>
+
+
+<div class="contact">
+    <img class="avatar" src="https://assets.codepen.io/1425525/avatar_2.jpg" alt="Джедай Падаванов">
+    <div class="contact-body">
+        <div class="contact-title">
+            <div class="contact-name">Константин Константинопольский (Дизайнер)</div>
+            <div class="contact-time">10:12</div>
+        </div>
+        <p class="contact-message">Привет, скоро третий проект? Уже скоро надо будет выложить. И забыл сказать, что внутрь проекта вставь пока текст вида Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+    </div>
+</div>
+<style>
+    body {
+        margin: 0;
+        padding: 50px;
+        font: 16px/1.5 sans-serif;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    .avatar {
+        width: 50px;
+        border-radius: 50%;
+    }
+
+    .contact {
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        background-color: #673ab7;
+        width: 420px;
+        overflow-x: hidden;
+    }
+
+    .contact-body {
+        padding: 1.5rem;
+        overflow-x: hidden;
+    }
+
+    .contact-title {
+        display: flex;
+    }
+
+    .contact-name {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow:ellipsis;
+        padding-right:10px;
+    }
+
+    .contact-time {
+        margin-left: auto;
+        font-size: 80%;
+    }
+
+    .contact-message {
+        margin: 0;
+        font-size: 80%;
+        color: #d6d6d6;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow:ellipsis;
+        padding-right:10px;
+    }
 </style>

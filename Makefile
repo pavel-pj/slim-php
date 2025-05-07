@@ -1,7 +1,12 @@
 install:
 	composer update
 	composer install
-validate:
+sa:
+	npm run sass:build
+saw:
+	npm run sass:watch
+test:
+	composer exec --verbose phpunit tests
 	composer validate
 up-ul:
 	composer dump-autoload
