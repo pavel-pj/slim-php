@@ -6,13 +6,18 @@
 
 
 .conteiner {
-  display:flex;
+  display: flex;
+  flex-wrap: wrap;
+
+  background: #673AB7;
+  width: 150px;
 
   .block {
-    width:60px;
-    height:60px;
-    background: aquamarine;
-    margin:auto 2px auto 2px;
+    padding: 20px;
+    margin:5px;
+
+    background: #2196F3;
+    color: #fff;
   }
 
 }
