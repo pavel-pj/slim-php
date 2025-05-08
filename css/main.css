@@ -1,31 +1,9 @@
+@charset "UTF-8";
 .container {
   display: flex;
-  justify-content: space-around;
-  align-items: stretch;
-  max-width: 400px;
-  padding: 20px 0;
-  background: #2196F3;
-}
-
-.container div {
-  padding: 10px;
-  font-weight: bold;
-  color: #fff;
-}
-
-.item-one {
-  background: #8258ca;
-  font-size: 1em;
-}
-
-.item-two {
-  background: #8258ca;
-  font-size: 2em;
-}
-
-.item-three {
-  background: #8258ca;
-  font-size: 3em;
+  justify-content: center; /* горизонтальное центрирование */
+  align-items: center; /* вертикальное центрирование */
+  height: 100vh; /* чтобы было вертикальное центрирование по всей высоте */
 }
 
 /*# sourceMappingURL=main.css.map */
