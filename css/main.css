@@ -1,14 +1,31 @@
-.conteiner {
+.container {
   display: flex;
-  flex-wrap: wrap;
-  background: #673AB7;
-  width: 150px;
-}
-.conteiner .block {
-  padding: 20px;
-  margin: 5px;
+  justify-content: space-around;
+  align-items: stretch;
+  max-width: 400px;
+  padding: 20px 0;
   background: #2196F3;
+}
+
+.container div {
+  padding: 10px;
+  font-weight: bold;
   color: #fff;
+}
+
+.item-one {
+  background: #8258ca;
+  font-size: 1em;
+}
+
+.item-two {
+  background: #8258ca;
+  font-size: 2em;
+}
+
+.item-three {
+  background: #8258ca;
+  font-size: 3em;
 }
 
 /*# sourceMappingURL=main.css.map */

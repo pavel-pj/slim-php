@@ -5,20 +5,35 @@
 @use "sass:string";
 
 
-.conteiner {
+.container {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: stretch;
+  max-width: 400px;
+  padding: 20px 0;
 
-  background: #673AB7;
-  width: 150px;
+  background: #2196F3;
+}
 
-  .block {
-    padding: 20px;
-    margin:5px;
+.container div {
+  padding: 10px;
 
-    background: #2196F3;
-    color: #fff;
-  }
+  font-weight: bold;
+  color: #fff;
+}
 
+.item-one {
+  background: #8258ca;
+  font-size: 1em;
+}
+
+.item-two {
+  background: #8258ca;
+  font-size: 2em;
+}
+
+.item-three {
+  background: #8258ca;
+  font-size: 3em;
 }
 
