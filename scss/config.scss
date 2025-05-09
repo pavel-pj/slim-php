@@ -1,13 +1,71 @@
-@forward "default_variables";
+@use "mixin";
 
 @use "sass:list";
 @use "sass:map";
 @use "sass:string";
 
-
-.container {
-  display: flex;
-  justify-content: center; /* горизонтальное центрирование */
-  align-items: center;     /* вертикальное центрирование */
-  height: 100vh;           /* чтобы было вертикальное центрирование по всей высоте */
+body {
+  display:flex;
+  flex-direction:column;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
 }
+
+.main {
+  margin:80px auto auto auto;
+  max-width:1600px;
+  width: 100%;
+  display:flex;
+  flex-direction:row;
+  background-color: dimgray;
+  @include mixin.flex-grow-1;
+
+   .side-bar{
+
+    background-color: aquamarine;
+    flex:0 0 20%;
+
+
+
+  }
+   .content {
+    flex:0 0 80%;
+    background-color: coral;
+
+
+  }
+}
+
+.top-menu {
+  height:80px;
+  background-color: plum;
+  position:fixed;
+  width:100%;
+  z-index: 1000; /* чтобы меню было сверху */
+}
+
+.footer {
+  background-color: green;
+  height:300px;
+}
+
+.flex-conteiner {
+  display:flex;
+  gap:10px;
+  justify-content: space-between;
+  padding:10px;
+}
+
+.card {
+  flex: 1 1 33%;
+  box-sizing: border-box; /* дополнительно, если нужно */
+  background-color: darkorchid;
+}
+
+
+
