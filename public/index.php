@@ -79,7 +79,11 @@ $app->addErrorMiddleware(true, true, true);
 $app->add(MethodOverrideMiddleware::class);
 
 
+$app->get('/grid', function ($request, $response) {
 
+
+    return $this->get('renderer')->render($response, 'grid/index.phtml' );
+}) ;
 
 
 $app->get('/err', function ($request, $response) {
